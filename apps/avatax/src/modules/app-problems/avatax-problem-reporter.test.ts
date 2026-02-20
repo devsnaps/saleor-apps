@@ -7,8 +7,11 @@ import {
   AvataxInvalidCredentialsError,
 } from "@/modules/taxes/tax-error";
 
-import { AvataxClientTaxCodeService } from "../avatax/avatax-client-tax-code.service";
-import { AVATAX_PROBLEM_KEYS, reportAvataxProblemFromError } from "./avatax-problem-reporter";
+import {
+  AVATAX_PROBLEM_KEYS,
+  isSaleorVersionCompatible,
+  reportAvataxProblemFromError,
+} from "./avatax-problem-reporter";
 
 const mockReportProblem = vi.fn();
 
@@ -22,16 +25,76 @@ function createMockClient(): Client {
   return {} as Client;
 }
 
+const COMPATIBLE_VERSION = "3.22.0";
+
+describe("isSaleorVersionCompatible", () => {
+  it("returns true for version 3.22.0", () => {
+    expect(isSaleorVersionCompatible("3.22.0")).toBe(true);
+  });
+
+  it("returns true for version 3.22", () => {
+    expect(isSaleorVersionCompatible("3.22")).toBe(true);
+  });
+
+  it("returns true for version 3.23.1", () => {
+    expect(isSaleorVersionCompatible("3.23.1")).toBe(true);
+  });
+
+  it("returns true for version 4.0.0", () => {
+    expect(isSaleorVersionCompatible("4.0.0")).toBe(true);
+  });
+
+  it("returns false for version 3.21.0", () => {
+    expect(isSaleorVersionCompatible("3.21.0")).toBe(false);
+  });
+
+  it("returns false for version 3.20.4", () => {
+    expect(isSaleorVersionCompatible("3.20.4")).toBe(false);
+  });
+
+  it("returns false for undefined", () => {
+    expect(isSaleorVersionCompatible(undefined)).toBe(false);
+  });
+
+  it("returns false for null", () => {
+    expect(isSaleorVersionCompatible(null)).toBe(false);
+  });
+
+  it("returns false for empty string", () => {
+    expect(isSaleorVersionCompatible("")).toBe(false);
+  });
+
+  it("returns false for invalid version string", () => {
+    expect(isSaleorVersionCompatible("abc")).toBe(false);
+  });
+});
+
 describe("reportAvataxProblemFromError", () => {
   beforeEach(() => {
     mockReportProblem.mockReset();
     mockReportProblem.mockResolvedValue({ isOk: () => true, mapErr: vi.fn() });
   });
 
+  it("skips reporting when saleor version is below 3.22", async () => {
+    const error = new AvataxInvalidCredentialsError("Auth failed");
+
+    await reportAvataxProblemFromError(createMockClient(), error, "3.20.4");
+
+    expect(mockReportProblem).not.toHaveBeenCalled();
+  });
+
+  it("skips reporting when saleor version is undefined", async () => {
+    const error = new AvataxInvalidCredentialsError("Auth failed");
+
+    await reportAvataxProblemFromError(createMockClient(), error, undefined);
+
+    expect(mockReportProblem).not.toHaveBeenCalled();
+  });
+
   it("reports invalid credentials for AvataxInvalidCredentialsError", async () => {
     const error = new AvataxInvalidCredentialsError("Auth failed");
 
-    await reportAvataxProblemFromError(createMockClient(), error);
+    await reportAvataxProblemFromError(createMockClient(), error, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -44,7 +107,7 @@ describe("reportAvataxProblemFromError", () => {
   it("reports forbidden access for AvataxForbiddenAccessError", async () => {
     const error = new AvataxForbiddenAccessError("PermissionRequired");
 
-    await reportAvataxProblemFromError(createMockClient(), error);
+    await reportAvataxProblemFromError(createMockClient(), error, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -63,7 +126,7 @@ describe("reportAvataxProblemFromError", () => {
       },
     });
 
-    await reportAvataxProblemFromError(createMockClient(), error);
+    await reportAvataxProblemFromError(createMockClient(), error, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -82,7 +145,7 @@ describe("reportAvataxProblemFromError", () => {
       },
     });
 
-    await reportAvataxProblemFromError(createMockClient(), error);
+    await reportAvataxProblemFromError(createMockClient(), error, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -101,32 +164,23 @@ describe("reportAvataxProblemFromError", () => {
       },
     });
 
-    await reportAvataxProblemFromError(createMockClient(), error);
+    await reportAvataxProblemFromError(createMockClient(), error, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).not.toHaveBeenCalled();
   });
 
-  it("reports tax code permission for AvataxClientTaxCodeService.ForbiddenAccessError", async () => {
-    const error = new AvataxClientTaxCodeService.ForbiddenAccessError("Permission error");
-
-    await reportAvataxProblemFromError(createMockClient(), error);
-
-    expect(mockReportProblem).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: AVATAX_PROBLEM_KEYS.TAX_CODE_PERMISSION,
-        criticalThreshold: 3,
-      }),
-    );
-  });
-
   it("does not report for unrelated errors", async () => {
-    await reportAvataxProblemFromError(createMockClient(), new Error("Some random error"));
+    await reportAvataxProblemFromError(
+      createMockClient(),
+      new Error("Some random error"),
+      COMPATIBLE_VERSION,
+    );
 
     expect(mockReportProblem).not.toHaveBeenCalled();
   });
 
   it("does not report for undefined/null errors", async () => {
-    await reportAvataxProblemFromError(createMockClient(), undefined);
+    await reportAvataxProblemFromError(createMockClient(), undefined, COMPATIBLE_VERSION);
 
     expect(mockReportProblem).not.toHaveBeenCalled();
   });

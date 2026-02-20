@@ -414,7 +414,7 @@ const handler = orderConfirmedAsyncWebhook.createHandler(async (_req, ctx) => {
                   token: authData.token,
                 });
 
-                reportAvataxProblemFromError(client, error);
+                reportAvataxProblemFromError(client, error, payload.version);
               });
 
               span.setStatus({
@@ -450,7 +450,7 @@ const handler = orderConfirmedAsyncWebhook.createHandler(async (_req, ctx) => {
               token: authData.token,
             });
 
-            reportAvataxProblemFromError(client, error);
+            reportAvataxProblemFromError(client, error, payload.version);
           });
 
           span.setStatus({
@@ -479,7 +479,7 @@ const handler = orderConfirmedAsyncWebhook.createHandler(async (_req, ctx) => {
             token: authData.token,
           });
 
-          reportAvataxProblemFromError(client, error);
+          reportAvataxProblemFromError(client, error, payload.version);
         });
 
         span.setStatus({

@@ -8,16 +8,39 @@ import {
   AvataxInvalidCredentialsError,
 } from "@/modules/taxes/tax-error";
 
-import { AvataxClientTaxCodeService } from "../avatax/avatax-client-tax-code.service";
-
 const logger = createLogger("AvataxProblemReporter");
+
+const MIN_SALEOR_VERSION = { major: 3, minor: 22 };
+
+/**
+ * Checks if the Saleor version supports appProblemCreate (>= 3.22).
+ * Returns false if version is missing or cannot be parsed.
+ */
+export function isSaleorVersionCompatible(saleorVersion: string | undefined | null): boolean {
+  if (!saleorVersion) {
+    return false;
+  }
+
+  const parts = saleorVersion.split(".");
+  const major = parseInt(parts[0], 10);
+  const minor = parseInt(parts[1], 10);
+
+  if (isNaN(major) || isNaN(minor)) {
+    return false;
+  }
+
+  if (major > MIN_SALEOR_VERSION.major) {
+    return true;
+  }
+
+  return major === MIN_SALEOR_VERSION.major && minor >= MIN_SALEOR_VERSION.minor;
+}
 
 export const AVATAX_PROBLEM_KEYS = {
   INVALID_CREDENTIALS: "avatax-invalid-credentials",
   FORBIDDEN_ACCESS: "avatax-forbidden-access",
   COMPANY_INACTIVE: "avatax-company-inactive",
   COMPANY_NOT_FOUND: "avatax-company-not-found",
-  TAX_CODE_PERMISSION: "avatax-tax-code-permission",
 } as const;
 
 const PROBLEM_MESSAGES: Record<string, string> = {
@@ -29,8 +52,6 @@ const PROBLEM_MESSAGES: Record<string, string> = {
     "AvaTax company account is inactive. Tax operations are not allowed. Please reactivate your company in AvaTax or update the configuration.",
   [AVATAX_PROBLEM_KEYS.COMPANY_NOT_FOUND]:
     "AvaTax company code not found. The configured company does not exist. Please verify the company code in your AvaTax configuration.",
-  [AVATAX_PROBLEM_KEYS.TAX_CODE_PERMISSION]:
-    "Unable to list AvaTax tax codes due to insufficient permissions. Your API key may lack the required scope. Please verify your license with Avalara support.",
 };
 
 function createReporter(client: Client) {
@@ -64,8 +85,23 @@ async function reportProblem(
 /**
  * Maps a caught AvaTax error to an appropriate app problem report.
  * Should be called in `after()` to avoid blocking the webhook response.
+ *
+ * @param saleorVersion - The Saleor version from `payload.version`. Required to gate
+ *   the feature to Saleor >= 3.22 which introduced appProblemCreate.
  */
-export async function reportAvataxProblemFromError(client: Client, error: unknown) {
+export async function reportAvataxProblemFromError(
+  client: Client,
+  error: unknown,
+  saleorVersion: string | undefined | null,
+) {
+  if (!isSaleorVersionCompatible(saleorVersion)) {
+    logger.debug("Skipping app problem report - Saleor version does not support appProblemCreate", {
+      saleorVersion,
+    });
+
+    return;
+  }
+
   const reporter = createReporter(client);
 
   if (error instanceof AvataxInvalidCredentialsError) {
@@ -94,11 +130,5 @@ export async function reportAvataxProblemFromError(client: Client, error: unknow
 
       return;
     }
-  }
-
-  if (error instanceof AvataxClientTaxCodeService.ForbiddenAccessError) {
-    await reportProblem(reporter, AVATAX_PROBLEM_KEYS.TAX_CODE_PERMISSION, 3);
-
-    return;
   }
 }

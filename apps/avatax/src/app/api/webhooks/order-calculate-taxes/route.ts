@@ -375,7 +375,7 @@ const handler = orderCalculateTaxesSyncWebhook.createHandler(async (_req, ctx) =
               token: ctx.authData.token,
             });
 
-            reportAvataxProblemFromError(client, error);
+            reportAvataxProblemFromError(client, error, payload.version);
           });
 
           span.setStatus({
@@ -494,7 +494,7 @@ const handler = orderCalculateTaxesSyncWebhook.createHandler(async (_req, ctx) =
             token: ctx.authData.token,
           });
 
-          reportAvataxProblemFromError(client, error);
+          reportAvataxProblemFromError(client, error, payload.version);
         });
 
         span.setStatus({

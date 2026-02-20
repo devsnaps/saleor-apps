@@ -325,7 +325,7 @@ const handler = orderCancelledAsyncWebhook.createHandler(async (_req, ctx) => {
           .map(logWriter.writeLog);
 
         after(() => {
-          reportAvataxProblemFromError(client, e);
+          reportAvataxProblemFromError(client, e, payload.version);
         });
 
         span.setStatus({
