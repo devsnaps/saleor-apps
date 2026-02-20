@@ -1,1 +1,1 @@
-export { AppProblemsReporter } from "./app-problems-reporter";
+export { AppProblemsReporter, AppProblemsReporterError } from "./app-problems-reporter";

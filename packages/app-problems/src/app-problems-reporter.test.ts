@@ -2,7 +2,7 @@ import { Client, CombinedError } from "urql";
 import { describe, expect, it, vi } from "vitest";
 
 import { AppProblemCreateDocument, AppProblemDismissByKeyDocument } from "../generated/graphql";
-import { AppProblemsReporter } from "./app-problems-reporter";
+import { AppProblemsReporter, AppProblemsReporterError } from "./app-problems-reporter";
 
 function createMockClient(mutation: ReturnType<typeof vi.fn>): Client {
   return { mutation: mutation as unknown as Client["mutation"] } as Client;
@@ -22,21 +22,25 @@ function mockMutationError(mutation: ReturnType<typeof vi.fn>, error: CombinedEr
 
 describe("AppProblemsReporter", () => {
   describe("reportProblem", () => {
-    it("calls AppProblemCreate mutation with provided input", async () => {
+    it("calls AppProblemCreate mutation with provided input and returns ok", async () => {
       const mutation = vi.fn();
 
       mockMutationResponse(mutation, { appProblemCreate: { errors: [] } });
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await reporter.reportProblem({ key: "tax-error", message: "Tax service unavailable" });
+      const result = await reporter.reportProblem({
+        key: "tax-error",
+        message: "Tax service unavailable",
+      });
 
+      expect(result.isOk()).toBe(true);
       expect(mutation).toHaveBeenCalledWith(AppProblemCreateDocument, {
         input: { key: "tax-error", message: "Tax service unavailable" },
       });
     });
 
-    it("throws when mutation returns GraphQL errors", async () => {
+    it("returns err with message when mutation returns GraphQL errors", async () => {
       const mutation = vi.fn();
 
       mockMutationResponse(mutation, {
@@ -47,39 +51,46 @@ describe("AppProblemsReporter", () => {
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await expect(reporter.reportProblem({ key: "x", message: "test" })).rejects.toThrow(
-        "Invalid key",
-      );
+      const result = await reporter.reportProblem({ key: "x", message: "test" });
+      const error = result._unsafeUnwrapErr();
+
+      expect(error).toBeInstanceOf(AppProblemsReporterError);
+      expect(error.message).toBe("Invalid key");
     });
 
-    it("throws when mutation returns transport error", async () => {
+    it("returns err when mutation returns transport error", async () => {
       const mutation = vi.fn();
-      const error = new CombinedError({ networkError: new Error("Network failure") });
+      const networkError = new CombinedError({ networkError: new Error("Network failure") });
 
-      mockMutationError(mutation, error);
+      mockMutationError(mutation, networkError);
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await expect(reporter.reportProblem({ key: "test", message: "test" })).rejects.toBe(error);
+      const result = await reporter.reportProblem({ key: "test", message: "test" });
+      const error = result._unsafeUnwrapErr();
+
+      expect(error).toBeInstanceOf(AppProblemsReporterError);
+      expect(error.message).toContain("Network failure");
     });
   });
 
   describe("clearProblems", () => {
-    it("calls AppProblemDismissByKey mutation with provided keys", async () => {
+    it("calls AppProblemDismissByKey mutation with provided keys and returns ok", async () => {
       const mutation = vi.fn();
 
       mockMutationResponse(mutation, { appProblemDismiss: { errors: [] } });
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await reporter.clearProblems(["tax-error", "payment-error"]);
+      const result = await reporter.clearProblems(["tax-error", "payment-error"]);
 
+      expect(result.isOk()).toBe(true);
       expect(mutation).toHaveBeenCalledWith(AppProblemDismissByKeyDocument, {
         keys: ["tax-error", "payment-error"],
       });
     });
 
-    it("throws when mutation returns GraphQL errors", async () => {
+    it("returns err with message when mutation returns GraphQL errors", async () => {
       const mutation = vi.fn();
 
       mockMutationResponse(mutation, {
@@ -90,18 +101,26 @@ describe("AppProblemsReporter", () => {
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await expect(reporter.clearProblems(["unknown-key"])).rejects.toThrow("Not found");
+      const result = await reporter.clearProblems(["unknown-key"]);
+      const error = result._unsafeUnwrapErr();
+
+      expect(error).toBeInstanceOf(AppProblemsReporterError);
+      expect(error.message).toBe("Not found");
     });
 
-    it("throws when mutation returns transport error", async () => {
+    it("returns err when mutation returns transport error", async () => {
       const mutation = vi.fn();
-      const error = new CombinedError({ networkError: new Error("Network failure") });
+      const networkError = new CombinedError({ networkError: new Error("Network failure") });
 
-      mockMutationError(mutation, error);
+      mockMutationError(mutation, networkError);
 
       const reporter = new AppProblemsReporter(createMockClient(mutation));
 
-      await expect(reporter.clearProblems(["test"])).rejects.toBe(error);
+      const result = await reporter.clearProblems(["test"]);
+      const error = result._unsafeUnwrapErr();
+
+      expect(error).toBeInstanceOf(AppProblemsReporterError);
+      expect(error.message).toContain("Network failure");
     });
   });
 });

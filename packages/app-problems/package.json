@@ -24,8 +24,10 @@
     }
   },
   "dependencies": {
+    "@saleor/errors": "workspace:*",
     "graphql": "catalog:",
-    "graphql-tag": "catalog:"
+    "graphql-tag": "catalog:",
+    "neverthrow": "catalog:"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "catalog:",
