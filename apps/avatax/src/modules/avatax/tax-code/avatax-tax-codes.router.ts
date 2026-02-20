@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { metadataCache } from "@/lib/app-metadata-cache";
 import { createSettingsManager } from "@/modules/app/metadata-manager";
+import { reportAvataxProblemFromError } from "@/modules/app-problems/avatax-problem-reporter";
 import { AvataxClientTaxCodeService } from "@/modules/avatax/avatax-client-tax-code.service";
 import { AvataxConnectionRepository } from "@/modules/avatax/configuration/avatax-connection-repository";
 import { CrudSettingsManager } from "@/modules/crud-settings/crud-settings.service";
@@ -65,6 +66,8 @@ export const avataxTaxCodesRouter = router({
       logger.error("Failed to fetch tax codes from AvaTax", { error: error });
 
       if (error instanceof AvataxClientTaxCodeService.ForbiddenAccessError) {
+        reportAvataxProblemFromError(ctx.apiClient, error);
+
         throw new TRPCError({
           code: "FORBIDDEN",
           cause: "AvaTax PermissionRequired",
