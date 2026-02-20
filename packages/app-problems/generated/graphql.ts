@@ -1,4 +1,6 @@
 import gql from "graphql-tag";
+import * as Urql from "urql";
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 type JSONValue = string | number | boolean | null | { [key: string]: JSONValue } | JSONValue[];
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -11,6 +13,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> =
   | T
   | { [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string };
@@ -31089,3 +31092,197 @@ export type _Entity =
 export type _Service = {
   readonly sdl?: Maybe<Scalars["String"]["output"]>;
 };
+
+export type AppProblemCreateMutationVariables = Exact<{
+  input: AppProblemCreateInput;
+}>;
+
+export type AppProblemCreateMutation = {
+  readonly appProblemCreate?: {
+    readonly errors: ReadonlyArray<{
+      readonly message?: string | null;
+      readonly code: AppProblemCreateErrorCode;
+      readonly field?: string | null;
+    }>;
+  } | null;
+};
+
+export type AppProblemDismissByKeyMutationVariables = Exact<{
+  keys?: InputMaybe<ReadonlyArray<Scalars["String"]["input"]> | Scalars["String"]["input"]>;
+}>;
+
+export type AppProblemDismissByKeyMutation = {
+  readonly appProblemDismiss?: {
+    readonly errors: ReadonlyArray<{
+      readonly field?: string | null;
+      readonly code: AppProblemDismissErrorCode;
+      readonly message?: string | null;
+    }>;
+  } | null;
+};
+
+export const UntypedAppProblemCreateDocument = gql`
+  mutation AppProblemCreate($input: AppProblemCreateInput!) {
+    appProblemCreate(input: $input) {
+      errors {
+        message
+        code
+        field
+      }
+    }
+  }
+`;
+
+export function useAppProblemCreateMutation() {
+  return Urql.useMutation<AppProblemCreateMutation, AppProblemCreateMutationVariables>(
+    UntypedAppProblemCreateDocument,
+  );
+}
+export const UntypedAppProblemDismissByKeyDocument = gql`
+  mutation AppProblemDismissByKey($keys: [String!]) {
+    appProblemDismiss(input: { byApp: { keys: $keys } }) {
+      errors {
+        field
+        code
+        message
+      }
+    }
+  }
+`;
+
+export function useAppProblemDismissByKeyMutation() {
+  return Urql.useMutation<AppProblemDismissByKeyMutation, AppProblemDismissByKeyMutationVariables>(
+    UntypedAppProblemDismissByKeyDocument,
+  );
+}
+
+export const AppProblemCreateDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "AppProblemCreate" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "AppProblemCreateInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "appProblemCreate" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "message" } },
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AppProblemCreateMutation, AppProblemCreateMutationVariables>;
+export const AppProblemDismissByKeyDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "AppProblemDismissByKey" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "keys" } },
+          type: {
+            kind: "ListType",
+            type: {
+              kind: "NonNullType",
+              type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "appProblemDismiss" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "byApp" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "keys" },
+                            value: { kind: "Variable", name: { kind: "Name", value: "keys" } },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "field" } },
+                      { kind: "Field", name: { kind: "Name", value: "code" } },
+                      { kind: "Field", name: { kind: "Name", value: "message" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AppProblemDismissByKeyMutation,
+  AppProblemDismissByKeyMutationVariables
+>;
