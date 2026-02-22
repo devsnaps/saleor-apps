@@ -2235,15 +2235,9 @@ importers:
       '@graphql-codegen/typed-document-node':
         specifier: 'catalog:'
         version: 5.0.5(graphql@16.7.1)
-      '@graphql-codegen/typescript':
-        specifier: 'catalog:'
-        version: 4.0.5(graphql@16.7.1)
       '@graphql-codegen/typescript-operations':
         specifier: 'catalog:'
         version: 4.1.3(graphql@16.7.1)
-      '@graphql-codegen/typescript-urql':
-        specifier: 'catalog:'
-        version: 4.0.0(graphql-tag@2.12.6(graphql@16.7.1))(graphql@16.7.1)
       '@graphql-typed-document-node/core':
         specifier: 'catalog:'
         version: 3.2.0(graphql@16.7.1)

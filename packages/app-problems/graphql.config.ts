@@ -50,12 +50,6 @@ const config: IGraphQLConfig = {
                   },
                 },
                 "typescript-operations",
-                {
-                  "typescript-urql": {
-                    documentVariablePrefix: "Untyped",
-                    fragmentVariablePrefix: "Untyped",
-                  },
-                },
                 "typed-document-node",
               ],
             },

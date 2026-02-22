@@ -1,5 +1,3 @@
-import gql from "graphql-tag";
-import * as Urql from "urql";
 import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 type JSONValue = string | number | boolean | null | { [key: string]: JSONValue } | JSONValue[];
 export type Maybe<T> = T | null;
@@ -13,7 +11,6 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> =
   | T
   | { [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string };
@@ -133,41 +130,6 @@ export type AppProblemDismissByKeyMutation = {
     }>;
   } | null;
 };
-
-export const UntypedAppProblemCreateDocument = gql`
-  mutation AppProblemCreate($input: AppProblemCreateInput!) {
-    appProblemCreate(input: $input) {
-      errors {
-        message
-        code
-        field
-      }
-    }
-  }
-`;
-
-export function useAppProblemCreateMutation() {
-  return Urql.useMutation<AppProblemCreateMutation, AppProblemCreateMutationVariables>(
-    UntypedAppProblemCreateDocument,
-  );
-}
-export const UntypedAppProblemDismissByKeyDocument = gql`
-  mutation AppProblemDismissByKey($keys: [String!]) {
-    appProblemDismiss(input: { byApp: { keys: $keys } }) {
-      errors {
-        field
-        code
-        message
-      }
-    }
-  }
-`;
-
-export function useAppProblemDismissByKeyMutation() {
-  return Urql.useMutation<AppProblemDismissByKeyMutation, AppProblemDismissByKeyMutationVariables>(
-    UntypedAppProblemDismissByKeyDocument,
-  );
-}
 
 export const AppProblemCreateDocument = {
   kind: "Document",
