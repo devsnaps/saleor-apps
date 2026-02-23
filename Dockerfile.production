@@ -33,24 +33,26 @@ ARG APP_PATH
 COPY --from=builder /app/apps/${APP_PATH}/.env.example ./apps/${APP_PATH}/.env
 
 # Set placeholder values for envs
-# Write values to .env file
-RUN echo "AWS_ACCESS_KEY_ID=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "AWS_REGION=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "AWS_SECRET_ACCESS_KEY=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "DYNAMODB_LOGS_TABLE_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "DYNAMODB_MAIN_TABLE_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "DYNAMODB_REQUEST_TIMEOUT_MS=5000" >> ./apps/${APP_PATH}/.env && \
-    echo "DYNAMODB_CONNECTION_TIMEOUT_MS=2000" >> ./apps/${APP_PATH}/.env && \
-    echo "SECRET_KEY=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "REQUEST_SECRET=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_HOST=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_PORT=1025" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_USER=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_PASSWORD=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_ENCRYPTION=NONE" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_SENDER_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
-    echo "FALLBACK_SMTP_SENDER_DOMAIN=example.com" >> ./apps/${APP_PATH}/.env && \
-    echo "APL=file" >> ./apps/${APP_PATH}/.env
+# Write values to .env file in one place so build-time env validation passes
+RUN cat >> ./apps/${APP_PATH}/.env <<'EOF'
+AWS_ACCESS_KEY_ID=placeholder
+AWS_REGION=placeholder
+AWS_SECRET_ACCESS_KEY=placeholder
+DYNAMODB_LOGS_TABLE_NAME=placeholder
+DYNAMODB_MAIN_TABLE_NAME=placeholder
+DYNAMODB_REQUEST_TIMEOUT_MS=5000
+DYNAMODB_CONNECTION_TIMEOUT_MS=2000
+SECRET_KEY=placeholder
+REQUEST_SECRET=placeholder
+FALLBACK_SMTP_HOST=placeholder
+FALLBACK_SMTP_PORT=1025
+FALLBACK_SMTP_USER=placeholder
+FALLBACK_SMTP_PASSWORD=placeholder
+FALLBACK_SMTP_ENCRYPTION=NONE
+FALLBACK_SMTP_SENDER_NAME=placeholder
+FALLBACK_SMTP_SENDER_DOMAIN=example.com
+APL=file
+EOF
 
 
 # Install dependencies

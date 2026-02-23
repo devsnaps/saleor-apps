@@ -14,12 +14,17 @@ permissions:
 env:
   REGISTRY: ghcr.io
 
+concurrency:
+  group: build-images-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-push:
     name: Build and push images
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 4
       matrix:
         include:
           - app_name: saleor-app-avatax
@@ -80,18 +85,14 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.app_path }}
           tags: |
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
             type=sha
-            type=ref,event=tag
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.title=${{ matrix.app_path }}
 
       - name: Build and push (main)
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.production
@@ -103,12 +104,12 @@ jobs:
             APP_PATH=${{ matrix.app_path }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.app_path }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app_path }}
 
       - name: Build and push (tag)
         if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.app_name == env.APP_NAME }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile.production
@@ -121,5 +122,5 @@ jobs:
           labels: |
             org.opencontainers.image.source=${{ github.repository }}
             org.opencontainers.image.title=${{ matrix.app_path }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.app_path }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app_path }}
