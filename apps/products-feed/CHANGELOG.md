@@ -1,5 +1,19 @@
 # saleor-app-products-feed
 
+## 2.1.13
+
+### Patch Changes
+
+- d9bb00f5: GraphQL schema has been refreshed to use latest 3.22 (this updates schema but does not change which APIs are executed)
+- c1cbffb4: Applied "consistent imports" rule from ESLint to ensure type-only imports are marked with `import type` clause. This should improve tree shaking and reduce side effects
+  - @saleor/apps-logger@1.6.3
+  - @saleor/apps-otel@2.4.0
+  - @saleor/react-hook-form-macaw@0.2.16
+  - @saleor/sentry-utils@0.2.5
+  - @saleor/apps-shared@1.14.1
+  - @saleor/apps-ui@1.3.2
+  - @saleor/webhook-utils@0.2.6
+
 ## 2.1.12
 
 ### Patch Changes
