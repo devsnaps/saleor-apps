@@ -39,7 +39,17 @@ RUN echo "AWS_ACCESS_KEY_ID=placeholder" >> ./apps/${APP_PATH}/.env && \
     echo "AWS_SECRET_ACCESS_KEY=placeholder" >> ./apps/${APP_PATH}/.env && \
     echo "DYNAMODB_LOGS_TABLE_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
     echo "DYNAMODB_MAIN_TABLE_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "DYNAMODB_REQUEST_TIMEOUT_MS=5000" >> ./apps/${APP_PATH}/.env && \
+    echo "DYNAMODB_CONNECTION_TIMEOUT_MS=2000" >> ./apps/${APP_PATH}/.env && \
     echo "SECRET_KEY=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "REQUEST_SECRET=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_HOST=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_PORT=1025" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_USER=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_PASSWORD=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_ENCRYPTION=NONE" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_SENDER_NAME=placeholder" >> ./apps/${APP_PATH}/.env && \
+    echo "FALLBACK_SMTP_SENDER_DOMAIN=example.com" >> ./apps/${APP_PATH}/.env && \
     echo "APL=file" >> ./apps/${APP_PATH}/.env
 
 
@@ -52,15 +62,6 @@ COPY --from=builder /app/out/full/ .
 # Ensure builds don't fail on APL check at build-time
 ENV NODE_ENV=production
 ENV APL=file
-ENV DYNAMODB_REQUEST_TIMEOUT_MS=5000
-ENV DYNAMODB_CONNECTION_TIMEOUT_MS=2000
-ENV AWS_ACCESS_KEY_ID=placeholder
-ENV AWS_SECRET_ACCESS_KEY=placeholder
-ENV AWS_REGION=placeholder
-ENV DYNAMODB_MAIN_TABLE_NAME=placeholder
-ENV DYNAMODB_LOGS_TABLE_NAME=placeholder
-ENV SECRET_KEY=placeholder
-ENV REQUEST_SECRET=placeholder
 
 # Build specific app
 ARG APP_NAME
