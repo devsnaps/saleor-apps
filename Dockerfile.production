@@ -52,6 +52,15 @@ COPY --from=builder /app/out/full/ .
 # Ensure builds don't fail on APL check at build-time
 ENV NODE_ENV=production
 ENV APL=file
+ENV DYNAMODB_REQUEST_TIMEOUT_MS=5000
+ENV DYNAMODB_CONNECTION_TIMEOUT_MS=2000
+ENV AWS_ACCESS_KEY_ID=placeholder
+ENV AWS_SECRET_ACCESS_KEY=placeholder
+ENV AWS_REGION=placeholder
+ENV DYNAMODB_MAIN_TABLE_NAME=placeholder
+ENV DYNAMODB_LOGS_TABLE_NAME=placeholder
+ENV SECRET_KEY=placeholder
+ENV REQUEST_SECRET=placeholder
 
 # Build specific app
 ARG APP_NAME
