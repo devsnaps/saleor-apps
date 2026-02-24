@@ -1,7 +1,9 @@
 import { type APL } from "@saleor/app-sdk/APL";
 import { DynamoAPL } from "@saleor/app-sdk/APL/dynamodb";
 import { FileAPL } from "@saleor/app-sdk/APL/file";
+import { RedisAPL } from "@saleor/app-sdk/APL/redis";
 import { SaleorApp } from "@saleor/app-sdk/saleor-app";
+import { createClient } from "redis";
 
 import { env } from "@/env";
 import { createLogger } from "@/logger";
@@ -32,6 +34,19 @@ switch (env.APL) {
       },
     });
 
+    break;
+  }
+
+  case "redis": {
+    if (!env.REDIS_URL) {
+      throw new Error("Redis APL is not configured - missing REDIS_URL");
+    }
+
+    apl = new RedisAPL({
+      client: createClient({
+        url: env.REDIS_URL,
+      }),
+    });
     break;
   }
 

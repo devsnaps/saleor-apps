@@ -85,6 +85,7 @@ The choice of the APL is done using `APL` environment variable. If the value is 
 
 - `file`: no additional setup is required. Good choice for local development. Can't be used for multi tenant-apps or be deployed (not intended for production)
 - `upstash`: use [Upstash](https://upstash.com/) Redis as storage method. Free account required. Can be used for development and production and supports multi-tenancy. Requires `UPSTASH_URL` and `UPSTASH_TOKEN` environment variables to be set
+- `redis`: use your own Redis instance as storage method. Requires `REDIS_URL` environment variable to be set
 
 If you want to use your own database, you can implement your own APL. [Check the documentation to read more.](https://docs.saleor.io/developer/extending/apps/developing-apps/app-sdk/apl)
 

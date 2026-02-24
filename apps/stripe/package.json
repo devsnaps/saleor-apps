@@ -70,6 +70,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
+    "redis": "catalog:",
     "stripe": "18.1.0",
     "urql": "catalog:",
     "usehooks-ts": "catalog:",

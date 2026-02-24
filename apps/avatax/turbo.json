@@ -7,6 +7,7 @@
         "ALLOWED_DOMAIN_PATTERN",
         "ANALYZE_BUNDLE",
         "APL",
+        "REDIS_URL",
         "APP_API_BASE_URL",
         "APP_IFRAME_BASE_URL",
         "AVATAX_CLIENT_TIMEOUT",
