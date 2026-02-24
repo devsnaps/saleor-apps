@@ -10,7 +10,6 @@
         "AWS_ACCESS_KEY_ID",
         "ALLOWED_DOMAIN_PATTERN",
         "APL",
-        "REDIS_URL",
         "APP_API_BASE_URL",
         "APP_IFRAME_BASE_URL",
         "MANIFEST_APP_ID",

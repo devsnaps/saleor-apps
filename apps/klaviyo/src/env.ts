@@ -8,7 +8,7 @@ export const env = createEnv({
   },
   server: {
     ALLOWED_DOMAIN_PATTERN: z.string().optional(),
-    APL: z.enum(["saleor-cloud", "file", "dynamodb", "upstash", "redis"]).default("file"),
+    APL: z.enum(["saleor-cloud", "file", "dynamodb", "upstash"]).default("file"),
     APP_API_BASE_URL: z.string().optional(),
     APP_IFRAME_BASE_URL: z.string().optional(),
     APP_LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
@@ -31,7 +31,6 @@ export const env = createEnv({
     OTEL_ACCESS_TOKEN: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
     REPOSITORY_URL: z.string().optional(),
-    REDIS_URL: z.string().optional(),
     NEXT_RUNTIME: z.string().optional(),
   },
   shared: {
@@ -66,7 +65,6 @@ export const env = createEnv({
     OTEL_ACCESS_TOKEN: process.env.OTEL_ACCESS_TOKEN,
     VERCEL_ENV: process.env.VERCEL_ENV,
     REPOSITORY_URL: process.env.REPOSITORY_URL,
-    REDIS_URL: process.env.REDIS_URL,
     NEXT_RUNTIME: process.env.NEXT_RUNTIME,
   },
   isServer: typeof window === "undefined" || process.env.NODE_ENV === "test",

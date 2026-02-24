@@ -71,7 +71,6 @@
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
     "react-is": "catalog:",
-    "redis": "catalog:",
     "urql": "catalog:",
     "usehooks-ts": "catalog:",
     "vite": "catalog:",

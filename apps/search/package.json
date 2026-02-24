@@ -65,7 +65,6 @@
     "react-dom": "catalog:",
     "react-helmet": "^6.1.0",
     "react-hook-form": "catalog:",
-    "redis": "catalog:",
     "urql": "catalog:",
     "zod": "catalog:"
   },

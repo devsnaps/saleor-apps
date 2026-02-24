@@ -10,7 +10,7 @@ export const env = createEnv({
   },
   server: {
     ALLOWED_DOMAIN_PATTERN: z.string().optional(),
-    APL: z.enum(["file", "dynamodb", "redis"]).default("file"),
+    APL: z.enum(["file", "dynamodb"]).default("file"),
     APP_API_BASE_URL: z.string().optional(),
     APP_IFRAME_BASE_URL: z.string().optional(),
     APP_LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
@@ -42,7 +42,6 @@ export const env = createEnv({
     OTEL_ACCESS_TOKEN: z.string().optional(),
     VERCEL_ENV: z.string().optional(),
     REPOSITORY_URL: z.string().optional(),
-    REDIS_URL: z.string().optional(),
     OTEL_TRACES_SAMPLER_ARG: z.coerce.number().min(0).max(1).default(1),
     OTEL_TENANT_DOMAIN_ALLOWLIST: z
       .string()
@@ -100,7 +99,6 @@ export const env = createEnv({
     OTEL_ACCESS_TOKEN: process.env.OTEL_ACCESS_TOKEN,
     VERCEL_ENV: process.env.VERCEL_ENV,
     REPOSITORY_URL: process.env.REPOSITORY_URL,
-    REDIS_URL: process.env.REDIS_URL,
     OTEL_TRACES_SAMPLER_ARG: process.env.OTEL_TRACES_SAMPLER_ARG,
     OTEL_TENANT_DOMAIN_ALLOWLIST: process.env.OTEL_TENANT_DOMAIN_ALLOWLIST,
     OTEL_METRICS_FLUSH_TIMEOUT_MILIS: process.env.OTEL_METRICS_FLUSH_TIMEOUT_MILIS,

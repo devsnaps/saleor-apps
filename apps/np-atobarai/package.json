@@ -66,7 +66,6 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-hook-form": "catalog:",
-    "redis": "catalog:",
     "urql": "catalog:",
     "usehooks-ts": "catalog:",
     "zod": "catalog:",

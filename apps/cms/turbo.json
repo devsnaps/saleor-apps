@@ -6,7 +6,6 @@
       "env": [
         "ALLOWED_DOMAIN_PATTERN",
         "APL",
-        "REDIS_URL",
         "APP_API_BASE_URL",
         "APP_IFRAME_BASE_URL",
         "NEXT_PUBLIC_SENTRY_DSN",
