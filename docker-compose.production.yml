@@ -1,0 +1,115 @@
+services:
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - dynamodb-data:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
+    user: root # needed to write to volume
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+  stripe:
+    image: ghcr.io/devsnaps/stripe:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SECRET_KEY=${STRIPE_SECRET_KEY:-change-me}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL:-http://localhost:8000}
+      - AWS_REGION=localhost
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - DYNAMODB_MAIN_TABLE_NAME=stripe-main-table
+      - DYNAMODB_REQUEST_TIMEOUT_MS=${DYNAMODB_REQUEST_TIMEOUT_MS}
+      - DYNAMODB_CONNECTION_TIMEOUT_MS=${DYNAMODB_CONNECTION_TIMEOUT_MS}
+      - APL=file
+      - ALLOWED_DOMAIN_PATTERN=${ALLOWED_DOMAIN_PATTERN:-.*}
+      - APP_API_BASE_URL=https://stripe.lvh.me
+      - APP_IFRAME_BASE_URL=https://stripe.lvh.me
+    restart: unless-stopped
+    depends_on:
+      - dynamodb-local
+    networks:
+      - backend-network
+      - traefik-network
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+      # Set the network
+      - traefik.docker.network=traefik-network
+      # HTTP service
+      - traefik.http.services.stripe.loadbalancer.server.port=3001
+      # Router for HTTPS
+      - traefik.http.routers.stripe.rule=Host(`stripe.lvh.me`)
+      - traefik.http.routers.stripe.entrypoints=websecure
+      - traefik.http.routers.stripe.tls=true
+      - traefik.http.routers.stripe.service=stripe
+
+  avatax:
+    image: ghcr.io/devsnaps/avatax:latest
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - APL=file
+      - SECRET_KEY=${AVATAX_SECRET_KEY:-change-me}
+      - ALLOWED_DOMAIN_PATTERN=${ALLOWED_DOMAIN_PATTERN:-.*}
+      - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL:-http://localhost:8000}
+      - AWS_REGION=localhost
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - DYNAMODB_MAIN_TABLE_NAME=avatax-main-table
+      - APP_API_BASE_URL=https://avatax.lvh.me
+      - APP_IFRAME_BASE_URL=https://avatax.lvh.me
+      - PORT=3000
+    restart: unless-stopped
+    depends_on:
+      - dynamodb-local
+    networks:
+      - backend-network
+      - traefik-network
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+      # Set the network
+      - traefik.docker.network=traefik-network
+      # HTTP service
+      - traefik.http.services.avatax.loadbalancer.server.port=3002
+      # Router for HTTPS
+      - traefik.http.routers.avatax.rule=Host(`avatax.lvh.me`)
+      - traefik.http.routers.avatax.entrypoints=websecure
+      - traefik.http.routers.avatax.tls=true
+      - traefik.http.routers.avatax.service=avatax
+
+  smtp:
+    image: ghcr.io/devsnaps/smtp:latest
+    ports:
+      - "3003:3000"
+    environment:
+      - NODE_ENV=production
+      - APL=file
+      - SECRET_KEY=${SMTP_SECRET_KEY:-change-me}
+      - ALLOWED_DOMAIN_PATTERN=${ALLOWED_DOMAIN_PATTERN:-.*}
+      - APP_API_BASE_URL=https://smtp.lvh.me
+      - APP_IFRAME_BASE_URL=https://smtp.lvh.me
+      - PORT=3000
+    networks:
+      - backend-network
+      - traefik-network
+    labels:
+      # Enable Traefik
+      - traefik.enable=true
+      # Set the network
+      - traefik.docker.network=traefik-network
+      # HTTP service
+      - traefik.http.services.smtp.loadbalancer.server.port=3003
+      # Router for HTTPS
+      - traefik.http.routers.smtp.rule=Host(`smtp.lvh.me`)
+      - traefik.http.routers.smtp.entrypoints=websecure
+      - traefik.http.routers.smtp.tls=true
+      - traefik.http.routers.smtp.service=smtp
