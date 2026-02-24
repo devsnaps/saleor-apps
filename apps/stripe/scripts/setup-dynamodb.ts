@@ -11,6 +11,7 @@ import {
 import { env } from "@/lib/env";
 
 const stripeMainTableName = env.DYNAMODB_MAIN_TABLE_NAME;
+const defaultEndpointUrl = env.AWS_ENDPOINT_URL;
 
 try {
   const {
@@ -21,7 +22,7 @@ try {
       "endpoint-url": {
         type: "string",
         short: "e",
-        default: "http://localhost:8000",
+        default: defaultEndpointUrl,
       },
     },
   });

@@ -9,6 +9,7 @@
         "APP_API_BASE_URL",
         "APP_IFRAME_BASE_URL",
         "AWS_ACCESS_KEY_ID",
+        "AWS_ENDPOINT_URL",
         "AWS_REGION",
         "AWS_SECRET_ACCESS_KEY",
         "DYNAMODB_MAIN_TABLE_NAME",

@@ -35,6 +35,7 @@ COPY --from=builder /app/apps/${APP_PATH}/.env.example ./apps/${APP_PATH}/.env
 # Set placeholder values for envs
 # Write values to .env file in one place so build-time env validation passes
 RUN cat >> ./apps/${APP_PATH}/.env <<'EOF'
+AWS_ENDPOINT_URL=http://localhost:8000
 AWS_ACCESS_KEY_ID=placeholder
 AWS_REGION=placeholder
 AWS_SECRET_ACCESS_KEY=placeholder
